@@ -953,16 +953,17 @@ footer{
   .collection-intro h2{font-size:clamp(2.2rem,9vw,3.2rem)}
 
   /* Product rows -> stay side-by-side like desktop, just compact, alternating sides */
-  .col-row{min-height:unset;height:230px;margin-bottom:10px}
-  .editorial-block,.editorial-block.reverse{min-height:unset;height:230px}
+  .col-row{min-height:230px;height:auto;align-items:stretch;margin-bottom:18px}
+  .editorial-block,.editorial-block.reverse{min-height:230px;height:auto;align-items:stretch;margin-bottom:18px}
 
   /* Show the whole product photo, no cropping */
-  .col-img,.editorial-img,.dome-hero-img,.strip-cell{background:var(--bg2)}
-  .col-img img,.editorial-img img,.dome-hero-img,.strip-cell img{
-    object-fit:contain !important;
-    transform:none !important;
-    filter:none !important;
+  .col-img,.editorial-img,.strip-cell{background:var(--bg2);min-height:230px}
+  .col-img img,.editorial-img img,.strip-cell img{
+    object-fit:contain;
+    transform:none;
+    filter:none;
   }
+  .dome-hero-img{object-fit:contain;background:var(--bg2)}
 
   .col-text,.editorial-text{
     padding:14px 16px;
@@ -1494,8 +1495,9 @@ const craftObserver = new IntersectionObserver((entries)=>{
 },{threshold:0.2});
 craftObserver.observe(craftSection);
 
-// PARALLAX on editorial images
+// PARALLAX on editorial images (desktop only — mobile shows the full image untransformed)
 window.addEventListener('scroll',()=>{
+  if(window.innerWidth<=768) return;
   document.querySelectorAll('.editorial-img img').forEach(img=>{
     const rect=img.closest('.editorial-img').getBoundingClientRect();
     const center=rect.top+rect.height/2-window.innerHeight/2;
