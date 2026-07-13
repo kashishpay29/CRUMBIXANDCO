@@ -316,8 +316,10 @@ nav.scrolled{
 .hero-scroll{
   position:absolute;
   bottom:40px;
-  left:50%;
-  transform:translateX(-50%);
+  left:0;
+  right:0;
+  width:fit-content;
+  margin:0 auto;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -952,30 +954,41 @@ footer{
   .collection-intro{padding:80px 24px 50px}
   .collection-intro h2{font-size:clamp(2.2rem,9vw,3.2rem)}
 
-  /* Collection grid rows -> stacked */
-  .col-row{grid-template-columns:1fr;min-height:auto}
-  .col-row-A .col-text,.col-row-A .col-img,
-  .col-row-B .col-text,.col-row-B .col-img{order:initial}
-  .col-img{order:1;height:min(42vw,320px)}
-  .col-text{order:2;padding:36px 24px 48px}
-  .col-text h2{font-size:clamp(2.2rem,9vw,3.2rem)}
-  .col-text p{max-width:none;font-size:1rem;line-height:1.8}
-  .col-tag{font-size:0.7rem;padding:9px 18px}
-  .col-img-label{font-size:0.7rem}
+  /* Product rows -> stay side-by-side like desktop, just compact, alternating sides */
+  .col-row{min-height:230px;height:auto;align-items:stretch;margin-bottom:18px}
+  .editorial-block,.editorial-block.reverse{min-height:230px;height:auto;align-items:stretch;margin-bottom:18px}
 
-  /* Editorial blocks -> stacked, image first */
-  .editorial-block,
-  .editorial-block.reverse{
-    grid-template-columns:1fr;
-    min-height:auto;
-    direction:ltr;
+  /* Show the whole product photo, no cropping — but keep it gently alive */
+  .col-img,.editorial-img,.strip-cell{background:var(--bg2);min-height:230px}
+  .col-img img,.editorial-img img,.strip-cell img{
+    object-fit:contain;
+    max-width:92%;
+    max-height:92%;
+    filter:none;
+    animation:gentleBreathe 6s ease-in-out infinite;
   }
-  .editorial-img{height:min(42vw,320px)}
-  .editorial-text{padding:36px 24px 48px}
-  .editorial-text h2{font-size:clamp(2.2rem,9vw,3.2rem)}
-  .editorial-text p{max-width:none;font-size:1rem;line-height:1.8}
-  .flavor-tag{font-size:0.7rem;padding:9px 18px}
-  .editorial-detail{font-size:0.72rem}
+  .dome-hero-img{object-fit:contain;background:var(--bg2)}
+
+  @keyframes gentleBreathe{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.05)}
+  }
+
+  .col-text,.editorial-text{
+    padding:14px 16px;
+    justify-content:center;
+  }
+  .col-text .section-label,.editorial-text .section-label{font-size:0.5rem;letter-spacing:0.2em;margin-bottom:6px}
+  .col-text h2,.editorial-text h2{font-size:1.15rem;line-height:1.15;margin:0 0 8px}
+  .accent-line{margin-bottom:10px}
+  .col-text p,.editorial-text p{
+    font-size:0.68rem;line-height:1.45;max-width:none;margin-bottom:10px;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .col-tags,.flavor-tags{gap:5px}
+  .col-tag,.flavor-tag{font-size:0.5rem;padding:4px 8px;letter-spacing:0.1em}
+  .editorial-detail{font-size:0.5rem}
+  .col-img-label,.strip-cell-label{font-size:0.5rem}
 
   .dome-hero{height:min(55vw,420px)}
   .dome-hero-text{left:20px;right:20px;bottom:24px;max-width:none}
@@ -1011,10 +1024,8 @@ footer{
 
 @media(max-width:480px){
   .hero-title{font-size:clamp(2.4rem,16vw,3.6rem)}
-  .col-text,.editorial-text{padding:32px 20px 40px}
-  .col-img,.editorial-img{height:min(45vw,260px)}
-  .flavor-tags,.col-tags{gap:8px}
-  .flavor-tag,.col-tag{font-size:0.68rem;padding:8px 16px}
+  .col-text,.editorial-text{padding:12px 12px 16px}
+  .col-text h2,.editorial-text h2{font-size:0.95rem}
 }
 /* ============================================================== */
 </style>
@@ -1493,8 +1504,9 @@ const craftObserver = new IntersectionObserver((entries)=>{
 },{threshold:0.2});
 craftObserver.observe(craftSection);
 
-// PARALLAX on editorial images
+// PARALLAX on editorial images (desktop only — mobile shows the full image untransformed)
 window.addEventListener('scroll',()=>{
+  if(window.innerWidth<=768) return;
   document.querySelectorAll('.editorial-img img').forEach(img=>{
     const rect=img.closest('.editorial-img').getBoundingClientRect();
     const center=rect.top+rect.height/2-window.innerHeight/2;
